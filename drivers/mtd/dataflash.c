@@ -28,7 +28,6 @@ int AT91F_DataflashInit (void)
 	int part;
 	int found[CONFIG_SYS_MAX_DATAFLASH_BANKS];
 	unsigned char protected;
-
 	AT91F_SpiInit ();
 
 	for (i = 0; i < CONFIG_SYS_MAX_DATAFLASH_BANKS; i++) {
@@ -40,6 +39,17 @@ int AT91F_DataflashInit (void)
 				&dataflash_info[i].Desc);
 
 		switch (dfcode) {
+    case AT45DB011:
+		    dataflash_info[i].Device.pages_number = 512;
+		    dataflash_info[i].Device.pages_size = 264;
+		    dataflash_info[i].Device.page_offset = 9;
+		    dataflash_info[i].Device.byte_mask = 0x100;
+		    dataflash_info[i].Device.cs = cs[i].cs;
+		    dataflash_info[i].Desc.DataFlash_state = IDLE;
+		    dataflash_info[i].logical_address = cs[i].addr;
+		    dataflash_info[i].id = dfcode;
+		    found[i] += dfcode;;
+		    break;
 		case AT45DB021:
 			dataflash_info[i].Device.pages_number = 1024;
 			dataflash_info[i].Device.pages_size = 264;
@@ -185,6 +195,9 @@ void dataflash_print_info (void)
 		if (dataflash_info[i].id != 0) {
 			printf("DataFlash:");
 			switch (dataflash_info[i].id) {
+			case AT45DB011:
+				printf("AT45DB011\n");
+				break;
 			case AT45DB021:
 				printf("AT45DB021\n");
 				break;
