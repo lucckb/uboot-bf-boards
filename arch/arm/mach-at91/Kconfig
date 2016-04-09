@@ -8,6 +8,11 @@ config TARGET_AT91RM9200EK
 	bool "Atmel AT91RM9200 evaluation kit"
 	select CPU_ARM920T
 
+
+config TARGET_AT91RM9200_BFC1
+	bool "BoFF AT91RM9200 BFC1 industrial computer"
+	select CPU_ARM920T
+
 config TARGET_AT91SAM9260EK
 	bool "Atmel at91sam9260 reference board"
 	select CPU_ARM926EJS
@@ -130,6 +135,7 @@ endchoice
 config SYS_SOC
 	default "at91"
 
+source "board/BoFF/at91rm9200_bfc1/Kconfig"
 source "board/atmel/at91rm9200ek/Kconfig"
 source "board/atmel/at91sam9260ek/Kconfig"
 source "board/atmel/at91sam9261ek/Kconfig"
