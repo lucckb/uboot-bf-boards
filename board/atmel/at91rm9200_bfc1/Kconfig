@@ -1,0 +1,11 @@
+if TARGET_AT91RM9200_BFC1
+
+config SYS_BOARD
+	default "at91rm9200_bfc1"
+
+config SYS_VENDOR
+	default "BoFF"
+
+config SYS_CONFIG_NAME
+	default "at91rm9200_bfc1"
+endif
