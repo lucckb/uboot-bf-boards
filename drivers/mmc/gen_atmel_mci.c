@@ -67,7 +67,6 @@ static void mci_set_mode(struct mmc *mmc, u32 hz, u32 blklen)
 	unsigned int version = atmel_mci_get_version(mci);
 	u32 clkodd = 0;
 	u32 mr;
-
 	debug("mci: bus_hz is %u, setting clock %u Hz, block size %u\n",
 		bus_hz, hz, blklen);
 	if (hz > 0) {
@@ -97,7 +96,9 @@ static void mci_set_mode(struct mmc *mmc, u32 hz, u32 blklen)
 	else
 		priv->curr_clk = (bus_hz / (clkdiv + 1)) / 2;
 	blklen &= 0xfffc;
-
+#ifdef CONFIG_AT91RM9200
+	if( clkdiv < 10 ) clkdiv=10;
+#endif
 	mr = MMCI_BF(CLKDIV, clkdiv);
 
 	/* MCI IP version >= 0x200 has R/WPROOF */
@@ -170,7 +171,12 @@ static u32 mci_data_read(atmel_mci_t *mci, u32* data, u32 error_flags)
 	} while (!(status & MMCI_BIT(RXRDY)));
 
 	if (status & MMCI_BIT(RXRDY)) {
+#ifdef CONFIG_AT91RM9200
+	/** Hardware BUG in the MCI controller in the AT91RM9200 chip */
+		*data = swab32( readl(&mci->rdr) );
+#else
 		*data = readl(&mci->rdr);
+#endif
 		status = 0;
 	}
 io_fail:
@@ -331,7 +337,10 @@ mci_send_cmd(struct mmc *mmc, struct mmc_cmd *cmd, struct mmc_data *data)
 	 */
 	if (cmd->cmdidx == MMC_CMD_SWITCH)
 		udelay(8*1000000 / priv->curr_clk); /* 8 clk in us */
-
+#ifdef CONFIG_AT91RM9200
+	/** Hardware BUG in the MCI controller in the AT91RM9200 chip */
+	udelay(700);
+#endif
 	return 0;
 }
 
@@ -363,7 +372,6 @@ static void mci_set_ios(struct mmc *mmc)
 			busw = 0;
 			break;
 		}
-
 		writel(busw << 6 | MMCI_BF(SCDSEL, MCI_BUS), &mci->sdcr);
 	} else {
 		busw = (bus_width == 4) ? 1 : 0;
@@ -432,8 +440,10 @@ int atmel_mci_init(void *regs)
 		cfg->host_caps = MMC_MODE_8BIT;
 		cfg->host_caps |= MMC_MODE_HS | MMC_MODE_HS_52MHz;
 	}
-
+#ifndef CONFIG_AT91RM9200
+	/** Hardware BUG in the MCI controller in the AT91RM9200 chip */
 	cfg->host_caps |= MMC_MODE_4BIT;
+#endif
 
 	/*
 	 * min and max frequencies determined by
