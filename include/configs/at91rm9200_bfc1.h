@@ -59,10 +59,6 @@
 
 #define CONFIG_BOARD_EARLY_INIT_F
 
-#define CONFIG_CMD_BOOTZ
-/* #define CONFIG_OF_LIBFDT */
-
-
 /*
  * Memory Configuration
  */
@@ -79,11 +75,6 @@
  */
 #ifndef CONFIG_SKIP_LOWLEVEL_INIT
 #define CONFIG_SYS_USE_MAIN_OSCILLATOR
-/* flash */
-#if 1
-#define CONFIG_SYS_EBI_CFGR_VAL	0x00000000
-#define CONFIG_SYS_SMC_CSR0_VAL	0x00003284 /* 16bit, 2 TDF, 4 WS */
-#endif
 
 /* clocks */
 #define CONFIG_SYS_PLLAR_VAL	0x20263E04 /* 179.712000 MHz for PCK */
@@ -112,7 +103,6 @@
 #define CONFIG_HAS_DATAFLASH
 #define CONFIG_SYS_MAX_DATAFLASH_BANKS		1
 #define CONFIG_SYS_DATAFLASH_LOGIC_ADDR_CS0	0xC0000000	/* CS0 */
-/* #define CONFIG_SYS_DATAFLASH_LOGIC_ADDR_CS3	0xD0000000	CS3 */
 #define AT91_SPI_CLK				15000000
 #define DATAFLASH_TCSS				(0x1a << 16)
 #define DATAFLASH_TCHS				(0x1 << 24)
@@ -137,8 +127,9 @@
  */
 #if 1
 #define CONFIG_CMD_EXT2
-#define CONFIG_CMD_MII
+/* #define CONFIG_CMD_MII */
 #define CONFIG_CMD_PING
+#define CONFIG_FS_EXT4
 #endif
 
 /* #define CONFIG_CMD_USB */
@@ -148,22 +139,22 @@
  */
 #define CONFIG_DRIVER_AT91EMAC
 #define CONFIG_SYS_RX_ETH_BUFFER	16
-#define CONFIG_RMII
 #define CONFIG_MII
+#define CONFIG_PHY_NATSEMI
+#define CONFIG_NET_RETRY_COUNT		20
+#define CONFIG_DRIVER_AT91EMAC_PHYADDR 1
 
-/*
- * NOR Flash
- */
-#if 0
-#define CONFIG_FLASH_CFI_DRIVER
-#define CONFIG_SYS_FLASH_CFI
-#define CONFIG_SYS_FLASH_BASE		0x10000000
-#define PHYS_FLASH_1			CONFIG_SYS_FLASH_BASE
-#define PHYS_FLASH_SIZE			SZ_8M
-#define CONFIG_SYS_MAX_FLASH_BANKS	1
-#define CONFIG_SYS_MAX_FLASH_SECT	256
-#define CONFIG_SYS_FLASH_PROTECTION
+
+/* MMC */
+#define CONFIG_CMD_MMC
+#ifdef CONFIG_CMD_MMC
+#define CONFIG_MMC
+#define CONFIG_GENERIC_MMC
+#define CONFIG_GENERIC_ATMEL_MCI
+#define CONFIG_DOS_PARTITION			1
 #endif
+
+/** Disable NOR flash SUPPORT */
 #define CONFIG_SYS_MAX_FLASH_BANKS 0
 #define CONFIG_SYS_NO_FLASH
 
@@ -176,7 +167,6 @@
 #define CONFIG_USB_OHCI_NEW			1
 #define CONFIG_USB_KEYBOARD			1
 #define CONFIG_USB_STORAGE			1
-#define CONFIG_DOS_PARTITION			1
 
 #define CONFIG_SYS_USB_OHCI_CPU_INIT		1
 #define CONFIG_SYS_USB_OHCI_REGS_BASE		ATMEL_USB_HOST_BASE
@@ -190,34 +180,17 @@
 #define CONFIG_ENV_OFFSET	(510*264)
 #define CONFIG_ENV_ADDR		(CONFIG_SYS_DATAFLASH_LOGIC_ADDR_CS0 + CONFIG_ENV_OFFSET)
 #define CONFIG_ENV_SIZE		(264*2)
-#define CONFIG_BOOTCOMMAND	"cp.b 0xC0084000 0x22000000 0x210000; bootm"
+#define CONFIG_BOOTCOMMAND	"ext2load mmc 0:1 0x21000000 /boot/uImage; bootm"
 #define CONFIG_BOOTARGS		"console=ttyS0,115200 "			\
-				"root=/dev/mtdblock0 "			\
-				"mtdparts=atmel_nand:-(root) "		\
-				"rw rootfstype=jffs2"
-
-#if 0
-/*
- * Environment Settings
- */
-#define CONFIG_ENV_IS_IN_FLASH
-
-/*
- * after u-boot.bin
- */
-#define CONFIG_ENV_ADDR			\
-		(CONFIG_SYS_FLASH_BASE + CONFIG_SYS_MONITOR_LEN)
-#define CONFIG_ENV_SIZE			SZ_64K /* sectors are 64K here */
-/* The following #defines are needed to get flash environment right */
-#define CONFIG_SYS_MONITOR_BASE		CONFIG_SYS_FLASH_BASE
-#define CONFIG_SYS_MONITOR_LEN		SZ_256K
-#endif
-
+			  "mem=32m " \
+				"root=/dev/mmcblk0p1 "	\
+				"rootdelay=1 init=/sbin/init " \
+				"rw"
 
 /*
  * Boot option
  */
-#define CONFIG_BOOTDELAY		3
+#define CONFIG_BOOTDELAY		2
 
 /* default load address */
 #define CONFIG_SYS_LOAD_ADDR		CONFIG_SYS_SDRAM_BASE + SZ_16M
@@ -227,10 +200,8 @@
  * Shell Settings
  */
 #define CONFIG_CMDLINE_EDITING
-#if 0
-#define CONFIG_SYS_LONGHELP
+/* #define CONFIG_SYS_LONGHELP */
 #define CONFIG_AUTO_COMPLETE
-#endif
 #define CONFIG_SYS_HUSH_PARSER
 #define CONFIG_SYS_CBSIZE		256	/* Console I/O Buffer Size */
 #define CONFIG_SYS_MAXARGS		16	/* max number of command args */
