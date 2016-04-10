@@ -64,6 +64,7 @@ extern unsigned int __machine_arch_type;
 #define MACH_TYPE_IXDP2400             242
 #define MACH_TYPE_IXDP2800             243
 #define MACH_TYPE_IXDP425              245
+#define MACH_TYPE_AT91RM9200_BOFF      251
 #define MACH_TYPE_HACKKIT              254
 #define MACH_TYPE_IXCDP1100            260
 #define MACH_TYPE_AT91RM9200DK         262

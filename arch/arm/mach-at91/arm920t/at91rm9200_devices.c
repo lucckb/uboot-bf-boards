@@ -59,3 +59,19 @@ void at91_seriald_hw_init(void)
 	at91_set_a_periph(AT91_PIO_PORTA, 31, 1);		/* DTXD */
 	/* writing SYS to PCER has no effect on AT91RM9200 */
 }
+
+
+#if defined(CONFIG_GENERIC_ATMEL_MCI)
+void at91_mci_hw_init(void)
+{
+	at91_periph_clk_enable(ATMEL_ID_MCI);
+	/* ATMEL mci one bit mode */
+	at91_set_a_periph(AT91_PIO_PORTA, 27, 1);	/* MCCK */
+	at91_set_a_periph(AT91_PIO_PORTA, 28, 1);	/* MCCDA */
+	at91_set_a_periph(AT91_PIO_PORTA, 29, 1);	/* MCDA0 */
+	/** Test only rest of the PINS */
+	at91_set_b_periph(AT91_PIO_PORTB, 3, 1);	/* MCDA1 */
+	at91_set_b_periph(AT91_PIO_PORTB, 4, 1);	/* MCDA2 */
+	at91_set_b_periph(AT91_PIO_PORTB, 5, 1);	/* MCDA3 */
+}
+#endif

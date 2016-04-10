@@ -16,6 +16,7 @@
 #include <asm/arch/at91_pio.h>
 #include <asm/arch/at91_common.h>
 #include <asm/io.h>
+#include <atmel_mci.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -31,7 +32,7 @@ int board_init(void)
 	writel(ATMEL_PMX_AA_TXD2, &pio->pioa.oer);
 
 	/* arch number of AT91RM9200EK-Board */
-	gd->bd->bi_arch_number = MACH_TYPE_AT91RM9200EK;
+	gd->bd->bi_arch_number = MACH_TYPE_AT91RM9200_BOFF;
 	/* adress of boot parameters */
 	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
 
@@ -56,5 +57,15 @@ int dram_init (void)
 int board_eth_init(bd_t *bis)
 {
 	return at91emac_register(bis, (u32) ATMEL_BASE_EMAC);
+}
+#endif
+
+
+#ifdef CONFIG_GENERIC_ATMEL_MCI
+int board_mmc_init(bd_t *bd)
+{
+	at91_mci_hw_init();
+
+	return atmel_mci_init((void *)ATMEL_BASE_MCI);
 }
 #endif
